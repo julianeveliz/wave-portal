@@ -6,14 +6,20 @@ import "hardhat/console.sol";
 
 contract WavePortal {
     uint256 totalWaves;
+    string lastWaveDate = 'Dummy date';
 
     constructor() {
-        console.log("Yo yo, I am a contract and I am smart");
+        console.log("This is my first Smart Contract :)");
     }
 
     function wave() public {
         totalWaves += 1;
         console.log("%s has waved!", msg.sender);
+    }
+
+    function saveLastWaveDate(string memory _lastdate) public {
+        lastWaveDate = _lastdate;
+        console.log("Last wave date: ", lastWaveDate);
     }
 
     function getTotalWaves() public view returns (uint256) {
