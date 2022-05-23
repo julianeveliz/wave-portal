@@ -1,22 +1,48 @@
 const main = async () => {
-  const date = new Date();
-  const [owner, randomPerson] = await hre.ethers.getSigners();
   const waveContractFactory = await hre.ethers.getContractFactory("WavePortal");
-  const waveContract = await waveContractFactory.deploy();
+  const waveContract = await waveContractFactory.deploy({
+    value: hre.ethers.utils.parseEther("0.1"),
+  });
   await waveContract.deployed();
-
   console.log("This Smart Contract address is: ", waveContract.address);
-  console.log("This Smart Contract is being executed by:", owner.address);
 
+  /*
+   * Get Contract balance
+   */
+  let contractBalance = await hre.ethers.provider.getBalance(
+    waveContract.address
+  );
+  console.log(
+    "Contract balance:",
+    hre.ethers.utils.formatEther(contractBalance)
+  );
+
+  /**
+   * Get Wave Wount
+   */
   let waveCount = await waveContract.getTotalWaves();
-  let lastWaveDate = await waveContract.saveLastWaveDate(date.toString());
+  console.log(waveCount.toNumber());
 
-  let waveTxn = await waveContract.connect(randomPerson).wave();
+  /*
+   * Let's try two waves now
+   */
+  const waveTxn = await waveContract.wave("This is wave #1");
   await waveTxn.wait();
 
-  waveCount = await waveContract.getTotalWaves();
+  const waveTxn2 = await waveContract.wave("This is wave #2");
+  await waveTxn2.wait();  
 
-  lastWaveDate = await waveContract.saveLastWaveDate(date.toString());
+  /*
+   * Get Contract balance to see what happened!
+   */
+  contractBalance = await hre.ethers.provider.getBalance(waveContract.address);
+  console.log(
+    "Contract balance:",
+    hre.ethers.utils.formatEther(contractBalance)
+  );
+
+  let allWaves = await waveContract.getAllWaves();
+  console.log(allWaves);
 };
 
 const runMain = async () => {
